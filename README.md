@@ -24,7 +24,7 @@ For now you also need to copy in the blank `TiUIwrapper.js` file too... I will f
 
 # To-DO
 
-- Add all properties as well... so you dont have to use the TiElement pass-through
+- Add all properties as well... so you dont have to use the proxy property pass-through
 
 - Add platform specific APIs for iOS and Andorid
 

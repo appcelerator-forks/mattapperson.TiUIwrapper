@@ -155,7 +155,7 @@ def build_wrapper():
     for key in api['Titanium.UI'].get('functions'):
         if key['name'].startswith('create'):
             
-            string += 'TiUIwrapper.' + key['name'] + '=function(_args){this.TiElement=Ti.UI.' + key['name'] + '(_args);};'
+            string += 'TiUIwrapper.' + key['name'] + '=function(_args){this.proxy=Ti.UI.' + key['name'] + '(_args);};'
             
             if key['name'].replace('create', '')[0].isdigit():
                 object_name = key['name'].replace('create', '_')
@@ -179,9 +179,9 @@ def build_wrapper():
                             parameters += ','
                     
                     if param_view != '':
-                        string += 'TiUIwrapper.' + key['name'] + '.prototype.'+method.get('name')+'=function('+parameters+') {var '+param_view+'='+param_view+'.TiElement||'+param_view+'; this.TiElement.'+method.get('name')+'('+parameters+');};'
+                        string += 'TiUIwrapper.' + key['name'] + '.prototype.'+method.get('name')+'=function('+parameters+') {var '+param_view+'='+param_view+'.proxy||'+param_view+'; this.proxy.'+method.get('name')+'('+parameters+');};'
                     else:
-                        string += 'TiUIwrapper.' + key['name'] + '.prototype.' + method.get('name') + '=function('+parameters+') {this.TiElement.' + method.get('name') + '('+parameters+');};'
+                        string += 'TiUIwrapper.' + key['name'] + '.prototype.' + method.get('name') + '=function('+parameters+') {this.proxy.' + method.get('name') + '('+parameters+');};'
     
     string += 'exports = TiUIwrapper'
     return string

@@ -1,17 +1,18 @@
 var TiUIwrapper = require('TiUIwrapper');
 
+//extend before we use it…
+TiUIwrapper.createLabel.prototype.laugh = function() {
+    alert('HAHAHAHA!');
+};
+
 var test = new TiUIwrapper.createLabel({text: 'YAY!!!'});
 
 // To directly edit a property of the element after creation… (fixing this soon)
-test.TiElement.backgroundColor = 'blue';
+test.proxy.backgroundColor = 'blue';
 
 test.addEventListener('click', function() {
     alert('YAY!!!!');
 });
-
-test.prototype.laugh = function() {
-alert('hahaha');
-};
 
 test.addEventListener('click', function() {
     test.laugh();
