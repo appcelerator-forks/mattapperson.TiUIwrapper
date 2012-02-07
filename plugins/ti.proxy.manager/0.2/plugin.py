@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # Titanium Compiler plugin 
-# ti.proxy.manager
+# __PROJECT_ID__
 #
 
 import os, sys, subprocess, hashlib
@@ -157,28 +157,31 @@ def build_wrapper():
             
             string += 'TiUIwrapper.' + key['name'] + '=function(_args){this.TiElement=Ti.UI.' + key['name'] + '(_args);};'
             
-            string += 'TiUIwrapper.' + key['name'] + '.prototype.add = function(tiChildView) {var v=tiChildView.TiElement||tiChildView;this.TiElement.add(v);};'
-            
-            string += 'TiUIwrapper.' + key['name'] + '.prototype.remove = function(tiChildView) {var v=tiChildView.TiElement||tiChildView;this.TiElement.remove(v);};'
-            
             if key['name'].replace('create', '')[0].isdigit():
                 object_name = key['name'].replace('create', '_')
             else:
                 object_name = key['name'].replace('create', '')
             
             for method in api['Titanium.UI.' + object_name].get('functions'):
-                if method.get('name') != 'add' and method.get('name') != 'remove':
-                    parameters = ''
-                    parm_count = 0
-                    if 'parameters' in method:
-                        for param in method['parameters']:
-                            parm_count += 1
-                            parameters += param.get('name')
-                            
-                            if parm_count != len(method.get('parameters')):
-                                parameters += ','
+                parameters = ''
+                parm_count = 0
+                param_view = ''
+                if 'parameters' in method:
+                    for param in method['parameters']:
+                        print method.get('name')
+                        parm_count += 1
+                        parameters += param.get('name')
+                        
+                        if param.get('type').startswith('Titanium.UI'):
+                            param_view = param.get('name')
+                        
+                        if parm_count != len(method.get('parameters')):
+                            parameters += ','
                     
-                    string += 'TiUIwrapper.' + key['name'] + '.prototype.' + method.get('name') + '=function('+parameters+') {this.TiElement.' + method.get('name') + '('+parameters+');};'
+                    if param_view != '':
+                        string += 'TiUIwrapper.' + key['name'] + '.prototype.'+method.get('name')+'=function('+parameters+') {var '+param_view+'='+param_view+'.TiElement||'+param_view+'; this.TiElement.'+method.get('name')+'('+parameters+');};'
+                    else:
+                        string += 'TiUIwrapper.' + key['name'] + '.prototype.' + method.get('name') + '=function('+parameters+') {this.TiElement.' + method.get('name') + '('+parameters+');};'
     
     string += 'exports = TiUIwrapper'
     return string
