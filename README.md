@@ -9,11 +9,11 @@ And yes it is cross platform :)
 You reference your plugin in the application `tiapp.xml` file such as:
 
     <plugins>
-        <plugin version="0.2">ti.proxy.manager</plugin>
+        <plugin version="0.3">ti.proxy.manager</plugin>
     </plugins>
 
 You then add your plugin directly to your project. Copy your `plugin.py` to the directory
-`$PROJECT_DIR/plugins/ti.proxy.manager/0.2/`.
+`$PROJECT_DIR/plugins/ti.proxy.manager/0.3/`.
 
 
 # Sample Application

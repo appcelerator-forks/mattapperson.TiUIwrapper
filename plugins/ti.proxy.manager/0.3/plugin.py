@@ -5,7 +5,7 @@
 # __PROJECT_ID__
 #
 
-import os, sys, subprocess, hashlib
+import os, sys, subprocess, codecs, hashlib
 
 try:
     import json
@@ -25,6 +25,9 @@ if hasattr(json, 'dumps'):
     json_write = json.dumps
 else:
     json_write = json.write
+
+ignoreFiles = ['.gitignore', '.cvsignore', '.DS_Store', 'TiUIwrapper.js']
+ignoreDirs = ['.git','.svn','_svn', 'CVS']
 
 ERROR_LOG_PREFIX = '[ERROR]'
 INFO_LOG_PREFIX = '[INFO]'
@@ -79,30 +82,30 @@ def debug(msg):
     log(DEBUG_LOG_PREIX, msg)
 
 def wrapperNeedsReloading(wrapper_file):
-    if len(sys.argv) < 2:
-        proj_dir = os.getcwd()
-    elif sys.argv[1] == 'run' or sys.argv[1] == 'deploy':
-        proj_dir = project_root()
-    else:
-        proj_dir = sys.argv[1]
+    #if len(sys.argv) < 2:
+    #   proj_dir = os.getcwd()
+    #elif sys.argv[1] == 'run' or sys.argv[1] == 'deploy':
+    #    proj_dir = project_root()
+    #else:
+    #    proj_dir = sys.argv[1]
     
-    wrapper_file = os.path.join(proj_dir, 'Resources/TiUIwrapper.js')
+    #wrapper_file = os.path.join(proj_dir, 'Resources/TiUIwrapper.js')
     
-    ti_sdk = build_config['tiapp'].properties['sdk-version']
+    #ti_sdk = build_config['tiapp'].properties['sdk-version']
     
-    plugin_version = build_config['plugin'].get('version')
+    #plugin_version = build_config['plugin'].get('version')
     
-    with open(wrapper_file, 'r') as f:
-        while True:
-            line1 = f.readline()
-            line2 = f.readline()
-            
-            if line1.find(ti_sdk) and line2.find(plugin_version):
-                return True
-            else:
-                return True
-            
-            if not line2: break
+    #with open(wrapper_file, 'r') as f:
+    #while True:
+    #line1 = f.readline()
+    #line2 = f.readline()
+    
+    #if line1.find(ti_sdk) and line2.find(plugin_version):
+    return True
+#else:
+#    return True
+
+#if not line2: break
 
 def read_json_api():
     if len(sys.argv) < 2:
@@ -137,6 +140,13 @@ def write_file_wrapper(path, text):
     f.close()
 
 def build_wrapper():
+    if len(sys.argv) < 2:
+        proj_dir = os.getcwd()
+    elif sys.argv[1] == 'run' or sys.argv[1] == 'deploy':
+        proj_dir = project_root()
+    else:
+        proj_dir = sys.argv[1]
+    
     info('Wrapper compiled')
     api = read_json_api()
     
@@ -147,15 +157,44 @@ def build_wrapper():
     string = '// ' + ti_sdk + "\n"
     string +='// ' + plugin_version + "\n"
     
-    string += 'var TiUIwrapper=exports;'
-    string += 'TiUIwrapper.iOS={};'
-    string += 'TiUIwrapper.iPhone={};'
-    string += 'TiUIwrapper.Android={};'
+    string += 'var w=exports;'
+    string += 'w.iOS={};'
+    string += 'w.iPhone={};'
+    string += 'w.Android={};'
+    
+    used_elements = []
+    all_elements = []
     
     for key in api['Titanium.UI'].get('functions'):
         if key['name'].startswith('create'):
-            
-            string += 'TiUIwrapper.' + key['name'] + '=function(_args){this.proxy=Ti.UI.' + key['name'] + '(_args);};'
+            all_elements.append(key)
+    
+    #for key in all_elements:
+    for root, dirs, files in os.walk(proj_dir):
+        for dir in dirs:
+            if dir in ignoreDirs:
+                dirs.remove(dir)
+        if len(files) > 0:
+            prefix = root[len(proj_dir):]
+            for f in files:
+                fp = os.path.splitext(f)
+                if fp[1] == '.js':
+                    fullpath = os.path.join(root,f)
+                    relative = prefix[1:]
+                    #js_contents = make_function_from_file(fullpath, pack=False)
+                    ext = os.path.splitext(fullpath)
+                    path = os.path.expanduser(fullpath)
+                    if ext[1][1:] == 'js':
+                        out = codecs.open(path,'r',encoding='utf-8').read()
+                        for line in out.split(';'):
+                            for method in all_elements:
+                                if line.find(method['name']) != -1:
+                                    if not method['name'] in used_elements:
+                                        used_elements.append(method['name'])
+    
+    for key in all_elements:
+        if key['name'] in used_elements:
+            string += 'w.' + key['name'] + '=function(_args){this.proxy=Ti.UI.' + key['name'] + '(_args);};'
             
             if key['name'].replace('create', '')[0].isdigit():
                 object_name = key['name'].replace('create', '_')
@@ -168,7 +207,6 @@ def build_wrapper():
                 param_view = ''
                 if 'parameters' in method:
                     for param in method['parameters']:
-                        print method.get('name')
                         parm_count += 1
                         parameters += param.get('name')
                         
@@ -179,11 +217,11 @@ def build_wrapper():
                             parameters += ','
                     
                     if param_view != '':
-                        string += 'TiUIwrapper.' + key['name'] + '.prototype.'+method.get('name')+'=function('+parameters+') {var '+param_view+'='+param_view+'.proxy||'+param_view+'; this.proxy.'+method.get('name')+'('+parameters+');};'
+                        string += 'w.' + key['name'] + '.prototype.'+method.get('name')+'=function('+parameters+') {var '+param_view+'='+param_view+'.proxy||'+param_view+'; this.proxy.'+method.get('name')+'('+parameters+');};'
                     else:
-                        string += 'TiUIwrapper.' + key['name'] + '.prototype.' + method.get('name') + '=function('+parameters+') {this.proxy.' + method.get('name') + '('+parameters+');};'
+                        string += 'w.' + key['name'] + '.prototype.' + method.get('name') + '=function('+parameters+') {this.proxy.' + method.get('name') + '('+parameters+');};'
     
-    string += 'exports = TiUIwrapper'
+    string += 'exports = w'
     return string
 
 def find_wrapper(path, file_hash_folder):
