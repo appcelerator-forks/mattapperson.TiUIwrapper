@@ -24,13 +24,9 @@ For now you also need to copy in the blank `TiUIwrapper.js` file too... I will f
 
 # To-DO
 
-- Add all properties as well... so you dont have to use the proxy property pass-through
-
 - Add platform specific APIs for iOS and Andorid
 
-- Add auto memory releaser
-
-- Add abilty to clean out un-needed wrappers when you distribute for the stores
+- Only re-build when deploying to store, or to device, else use full version
 
 # License
 

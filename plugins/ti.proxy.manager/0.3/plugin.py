@@ -220,6 +220,12 @@ def build_wrapper():
                         string += 'w.' + key['name'] + '.prototype.'+method.get('name')+'=function('+parameters+') {var '+param_view+'='+param_view+'.proxy||'+param_view+'; this.proxy.'+method.get('name')+'('+parameters+');};'
                     else:
                         string += 'w.' + key['name'] + '.prototype.' + method.get('name') + '=function('+parameters+') {this.proxy.' + method.get('name') + '('+parameters+');};'
+                
+                else:
+                    string += 'w.' + key['name'] + '.prototype.' + method.get('name') + '=function() {this.proxy.' + method.get('name') + '();};'
+            
+            string += 'w.' + key['name'] + '.prototype.onDestroy=function() {};'
+            string += 'w.' + key['name'] + '.prototype.release=function() {this.proxy.backgroundImage=undefined;this.proxy=undefined;this.onDestroy();};'
     
     string += 'exports = w'
     return string
