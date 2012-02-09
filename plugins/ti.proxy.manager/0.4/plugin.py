@@ -231,14 +231,24 @@ def build_wrapper():
     return string
 
 def find_wrapper(path, file_hash_folder):
-    for root, dirs, files in os.walk(path):
-        for name in files:
-            if name == 'TiUIwrapper.js':
-                if wrapperNeedsReloading(os.path.join(root, name)):
-                    info("Compiling Wrapper")
-                    
-                    file_hashes = build_wrapper()
-                    write_file_wrapper(file_hash_folder, file_hashes)
+    if len(sys.argv) < 2:
+        proj_dir = os.getcwd()
+    elif sys.argv[1] == 'run' or sys.argv[1] == 'deploy':
+        proj_dir = project_root()
+    else:
+        proj_dir = sys.argv[1]
+    
+    wrapper_file = os.path.join(proj_dir, 'Resources/TiUIwrapper.js')
+    
+    if not os.path.isfile(wrapper_file):
+        open(wrapper_file, 'w+').close()
+        print "file created"
+    
+    if wrapperNeedsReloading(wrapper_file):
+        info("Compiling Wrapper")
+        
+        file_hashes = build_wrapper()
+        write_file_wrapper(file_hash_folder, file_hashes)
 
 
 def real_compile(config, file_hash_folder):

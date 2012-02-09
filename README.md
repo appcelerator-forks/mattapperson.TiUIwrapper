@@ -34,8 +34,6 @@ You then add your plugin directly to your project. Copy your `plugin.py` to the 
 
 The `example/` folder contains a very simple `app.js` as a proof-of-concept.  You can copy that file into a new project, then run the project to see how it works.
 
-For now you also need to copy in the blank `TiUIwrapper.js` file too... I will fix that ASAP
-
 # To-DO
 
 See the issues tab...
