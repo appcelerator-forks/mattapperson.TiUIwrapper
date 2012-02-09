@@ -18,7 +18,7 @@ onDestroy() is used to take actions when a UI element is being released, think l
 
 release() is used in place of making a proxy = undefined, but also clears things like background images to make sure ALL memory is released in a single command.
 
-## This Plugin
+## Installing this plugin
 
 You reference your plugin in the application `tiapp.xml` file such as:
 
