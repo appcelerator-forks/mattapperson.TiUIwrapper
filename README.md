@@ -1,19 +1,33 @@
 # TiUIWrapper
 
 The TiUIWrapper plugin auto generates a wrapper plugin for whatever Titanium SDK your using, and auto regenerates only when you need to.
+It creates a wrapper for any UI object you use, and only the ones you need to save on space.
 
-And yes it is cross platform :)
+To understand why you NEED a wrapper in Titanium, see [this Appcelerator blog post](http://developer.appcelerator.com/blog/2012/02/what-is-a-titanium-proxy-object.html)
+
+And yes it is 100% cross platform :)
+
+So what is better about TiUIWrapper over others that are out there?
+TiUIWrapper is auto generated based on the code you write in your app, and the Titanium APIs... so if Appcelerator adds a new UI elements, its automaticly in TiUIWrapper!
+
+Also, it auto creates passthroughs for methods so you can use less code then any other wrapper, and its easier to use.
+
+On top of all that, 2 new methods are added to all UI components, onDestroy(), and release()
+
+onDestroy() is used to take actions when a UI element is being released, think like the close event listener on a window, but for views
+
+release() is used in place of making a proxy = undefined, but also clears things like background images to make sure ALL memory is released in a single command.
 
 ## This Plugin
 
 You reference your plugin in the application `tiapp.xml` file such as:
 
     <plugins>
-        <plugin version="0.3">ti.proxy.manager</plugin>
+        <plugin version="0.4">ti.proxy.manager</plugin>
     </plugins>
 
 You then add your plugin directly to your project. Copy your `plugin.py` to the directory
-`$PROJECT_DIR/plugins/ti.proxy.manager/0.3/`.
+`$PROJECT_DIR/plugins/ti.proxy.manager/0.4/`.
 
 
 # Sample Application

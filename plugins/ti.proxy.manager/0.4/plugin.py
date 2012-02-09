@@ -194,7 +194,7 @@ def build_wrapper():
     
     for key in all_elements:
         if key['name'] in used_elements:
-            string += 'w.' + key['name'] + '=function(_args){this.proxy=Ti.UI.' + key['name'] + '(_args);};'
+            string += 'w.' + key['name'] + '=function(_args){this.proxy=Ti.UI.' + key['name'] + '(_args);'
             
             if key['name'].replace('create', '')[0].isdigit():
                 object_name = key['name'].replace('create', '_')
@@ -217,16 +217,16 @@ def build_wrapper():
                             parameters += ','
                     
                     if param_view != '':
-                        string += 'w.' + key['name'] + '.prototype.'+method.get('name')+'=function('+parameters+') {var '+param_view+'='+param_view+'.proxy||'+param_view+'; this.proxy.'+method.get('name')+'('+parameters+');};'
+                        string += 'this.' + method.get('name') + '=function(' + parameters + ') {var ' + param_view + '=' + param_view + '.proxy||' + param_view + '; this.proxy.' + method.get('name') + '(' + parameters + ');};'
                     else:
-                        string += 'w.' + key['name'] + '.prototype.' + method.get('name') + '=function('+parameters+') {this.proxy.' + method.get('name') + '('+parameters+');};'
+                        string += 'this.' + method.get('name') + '=function(' + parameters + ') {this.proxy.' + method.get('name') + '(' + parameters + ');};'
                 
                 else:
-                    string += 'w.' + key['name'] + '.prototype.' + method.get('name') + '=function() {this.proxy.' + method.get('name') + '();};'
+                    string += 'this.' + method.get('name') + '=function() {this.proxy.' + method.get('name') + '();};'
             
-            string += 'w.' + key['name'] + '.prototype.onDestroy=function() {};'
-            string += 'w.' + key['name'] + '.prototype.release=function() {this.proxy.backgroundImage=undefined;this.proxy=undefined;this.onDestroy();};'
-    
+            string += 'this.onDestroy=function() {};'
+            string += 'this.release=function() {this.proxy.backgroundImage=undefined;this.proxy=undefined;this.onDestroy();};'
+            string += '};'
     string += 'exports = w'
     return string
 
