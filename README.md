@@ -24,9 +24,7 @@ For now you also need to copy in the blank `TiUIwrapper.js` file too... I will f
 
 # To-DO
 
-- Add platform specific APIs for iOS and Andorid
-
-- Only re-build when deploying to store, or to device, else use full version
+See the issues tab...
 
 # License
 
